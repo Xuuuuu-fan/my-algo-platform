@@ -1,0 +1,50 @@
+/* 引入字体 */
+
+/* 让导航栏半透明，与星空背景融合 */
+.navbar {
+  background-color: rgba(15, 23, 42, 0.9) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 隐藏首页默认的 footer 边距，让星空铺满 */
+.footer {
+  margin-top: 0 !important;
+}
+
+/* 针对移动端隐藏部分轨道，防止太拥挤 */
+@media (max-width: 768px) {
+  /* 这里由 JS 动态计算更好，但可以通过 CSS 简单缩放 */
+}
+/* 针对 Markdown 内容区域的图片全局样式 */
+.markdown img {
+  /* 1. 布局优化 */
+  display: block;           /* 变为块级元素 */
+  margin: 30px auto;        /* 上下留白30px，左右自动居中 */
+  max-width: 80%;           /* 限制最大宽度，不让图片撑满全屏，两边留出呼吸感 */
+
+  /* 2. 外观优化 */
+  border-radius: 12px;      /* 添加圆角，看起来更柔和 */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); /* 添加悬浮阴影，增加层次感 */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* 加上微弱的边框 */
+
+  /* 3. 交互优化 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 鼠标悬停时轻微放大，增加互动感 */
+.markdown img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+/* 当处于深色模式时 */
+[data-theme='dark'] .markdown img {
+  /* 降低亮度至 85%，防止白底图片刺眼 */
+  filter: brightness(0.85);
+}
+
+/* 鼠标悬停时恢复亮度，方便看清细节 */
+[data-theme='dark'] .markdown img:hover {
+  filter: brightness(1);
+}

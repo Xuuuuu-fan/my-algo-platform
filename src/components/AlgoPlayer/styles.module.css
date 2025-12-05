@@ -1,0 +1,122 @@
+.container {
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  background: #0d1117; /* GitHub Dark 背景 */
+  overflow: hidden;
+  margin: 2rem 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.header {
+  padding: 12px 20px;
+  border-bottom: 1px solid #30363d;
+  background: #161b22;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.stepBadge {
+  background: #00d8ff;
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.description {
+  color: #c9d1d9;
+  font-size: 14px;
+}
+
+.mainArea {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 左右分栏 */
+  min-height: 300px;
+}
+
+/* 移动端适配：上下分栏 */
+@media (max-width: 768px) {
+  .mainArea {
+    grid-template-columns: 1fr;
+  }
+}
+
+.codePanel {
+  background: #0d1117;
+  padding: 10px 0;
+  border-right: 1px solid #30363d;
+  overflow-x: auto;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+}
+
+.codeLine {
+  display: flex;
+  padding: 2px 10px;
+  color: #8b949e;
+}
+
+.activeLine {
+  background: rgba(46, 160, 67, 0.2); /* 绿色高亮背景 */
+  color: #e6edf3;
+  border-left: 3px solid #2ea043;
+}
+
+.lineNum {
+  width: 30px;
+  text-align: right;
+  margin-right: 15px;
+  opacity: 0.5;
+  user-select: none;
+}
+
+.visualPanel {
+  background: #010409;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.controls {
+  padding: 12px;
+  border-top: 1px solid #30363d;
+  background: #161b22;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn, .btnPrimary {
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  background: #21262d;
+  color: #c9d1d9;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  background: #30363d;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  background: #238636; /* 绿色按钮 */
+  border-color: #238636;
+  color: white;
+  font-weight: bold;
+}
+
+.btnPrimary:hover {
+  background: #2ea043;
+}
