@@ -32,8 +32,9 @@
 
 .mainArea {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 左右分栏 */
-  min-height: 300px;
+  grid-template-columns: 35% 65%;
+  min-height: 350px; /*稍微增高一点*/
+  position: relative;
 }
 
 /* 移动端适配：上下分栏 */
@@ -77,11 +78,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 10px;
   position: relative;
+  /* 新增：防止内容溢出遮挡左侧 */
   overflow: hidden;
+  border-left: 1px solid #30363d; /* 加一条分割线更清晰 */
 }
-
 .controls {
   padding: 12px;
   border-top: 1px solid #30363d;

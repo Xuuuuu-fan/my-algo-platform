@@ -48,3 +48,108 @@
 [data-theme='dark'] .markdown img:hover {
   filter: brightness(1);
 }
+
+/* =========================================
+   侧边栏科技感图标系统
+   原理：利用 CSS Mask 将背景色裁剪成图标形状
+   ========================================= */
+
+/* 1. 基础图标样式设置 */
+/* 针对文档链接 (type: doc) */
+.menu__list-item a[class*="sidebar-icon-"]::before,
+/* 针对分类链接 (type: category) */
+.menu__list-item[class*="sidebar-icon-"] .menu__link::before {
+  content: '';
+  display: inline-block;
+  width: 20px;     /* 图标宽度 */
+  height: 20px;    /* 图标高度 */
+  margin-right: 10px;
+  background-color: var(--ifm-color-primary); /* 使用你的主题色(青色) */
+
+  /* 核心：使用 mask 遮罩 */
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+
+  transition: background-color 0.2s ease;
+}
+
+/* 鼠标悬停时，图标变亮白，增加交互感 */
+.menu__list-item a[class*="sidebar-icon-"]:hover::before,
+.menu__list-item[class*="sidebar-icon-"] .menu__link:hover::before {
+  background-color: #fff;
+  box-shadow: 0 0 10px var(--ifm-color-primary);
+}
+
+/* =========================================
+   2. 定义具体的图标形状 (SVG DataURI)
+   ========================================= */
+
+/* 首页 -> 仪表盘/芯片 (Dashboard) */
+.sidebar-icon-dashboard a::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>');
+}
+
+/* 树 -> 电路分叉 (Git Branch/Circuit) */
+.sidebar-icon-tree .menu__link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>');
+}
+
+/* 线性表 -> 数据栈/服务器 (Stack/Layers) */
+.sidebar-icon-stack .menu__link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>');
+}
+
+/* 图论 -> 神经网络/连接 (Network/Share) */
+.sidebar-icon-network .menu__link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>');
+}
+
+/* =========================================
+   新增：具体数据结构与算法的图标定义
+   ========================================= */
+
+/* 1. 数组 (Array) -> 矩阵网格 */
+/* 视觉隐喻：连续的内存空间块 */
+.sidebar-icon-array .menu__link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>');
+}
+
+/* 2. 链表 (LinkedList) -> 链条链接 */
+/* 视觉隐喻：节点之间的指针连接 */
+.sidebar-icon-linkedlist .menu__link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>');
+}
+
+/* 3. 栈 (Stack) -> 堆叠层 */
+/* 视觉隐喻：后进先出的层叠结构 */
+.sidebar-icon-stack-structure .menu__link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>');
+}
+
+/* 4. 队列 (Queue) -> 流动点 */
+/* 视觉隐喻：先进先出的水平序列 */
+.sidebar-icon-queue .menu__link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="12" r="3"></circle><circle cx="12" cy="12" r="3"></circle><circle cx="18" cy="12" r="3"></circle></svg>');
+}
+
+/* 5. 查找 (Search) -> 瞄准镜/放大镜 */
+/* 视觉隐喻：搜索目标 */
+.sidebar-icon-search .menu__link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>');
+}
+
+/* 6. 排序 (Sort) -> 柱状图/升序 */
+/* 视觉隐喻：数据整理与排列 */
+.sidebar-icon-sort .menu__link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>');
+}
+
+/* 7. 字符串 (String) -> 文本符号/引用 */
+/* 视觉隐喻：字符序列 */
+.sidebar-icon-string .menu__link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M4 7V4h16v3"></path><path d="M9 20h6"></path><path d="M12 4v16"></path></svg>');
+}

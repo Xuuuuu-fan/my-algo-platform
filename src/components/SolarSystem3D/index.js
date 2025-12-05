@@ -8,20 +8,20 @@ import * as THREE from 'three';
 const PLANETS = [
   // 基础 (内圈 - 岩石行星)
   { id: 'array', title: '数组', path: '/docs/demo', type: 'rocky', color: '#00f2ff', radius: 14, speed: 0.6, size: 1.8 },
-  { id: 'linkedlist', title: '链表', path: '/docs/linkedlist', type: 'rocky', color: '#00c3ff', radius: 19, speed: 0.5, size: 2.0 },
+  { id: 'linkedlist', title: '链表', path: '/docs/list/intro', type: 'rocky', color: '#00c3ff', radius: 19, speed: 0.5, size: 2.0 },
 
   // 核心 (中圈 - 气态/特殊行星)
-  { id: 'stack', title: '栈', path: '/docs/stack', type: 'gas', color: '#ff0055', radius: 26, speed: 0.4, size: 2.8 },
-  { id: 'queue', title: '队列', path: '/docs/queue', type: 'gas', color: '#ff9900', radius: 34, speed: 0.35, size: 3.0 },
+  { id: 'stack', title: '栈', path: '/docs/stack/intro', type: 'gas', color: '#ff0055', radius: 26, speed: 0.4, size: 2.8 },
+  { id: 'queue', title: '队列', path: '/docs/queue/intro', type: 'gas', color: '#ff9900', radius: 34, speed: 0.35, size: 3.0 },
 
   // 进阶 (外圈 - 巨大行星/环状行星)
   { id: 'tree', title: '树/二叉树', path: '/docs/tree/intro', type: 'earth', color: '#00ff66', radius: 44, speed: 0.25, size: 3.5 },
-  { id: 'graph', title: '图论', path: '/docs/graph', type: 'gas', color: '#bd00ff', radius: 56, speed: 0.2, size: 4.0 },
+  { id: 'graph', title: '图论', path: '/docs/graph/intro', type: 'gas', color: '#bd00ff', radius: 56, speed: 0.2, size: 4.0 },
 
   // 算法 (边缘 - 环状/神秘)
-  { id: 'search', title: '查找', path: '/docs/search', type: 'ring', color: '#ffe600', radius: 70, speed: 0.15, size: 3.2 },
-  { id: 'sort', title: '排序', path: '/docs/sort', type: 'gas', color: '#ff3366', radius: 85, speed: 0.12, size: 3.8 },
-  { id: 'string', title: '字符串', path: '/docs/string', type: 'ring', color: '#ffffff', radius: 100, speed: 0.08, size: 3.5 },
+  { id: 'search', title: '查找', path: '/docs/search/intro', type: 'ring', color: '#ffe600', radius: 70, speed: 0.15, size: 3.2 },
+  { id: 'sort', title: '排序', path: '/docs/sort/intro', type: 'gas', color: '#ff3366', radius: 85, speed: 0.12, size: 3.8 },
+  { id: 'string', title: '字符串', path: '/docs/string/intro', type: 'ring', color: '#ffffff', radius: 100, speed: 0.08, size: 3.5 },
 ];
 
 // --- 2. 原生粒子爆炸 ---
@@ -246,32 +246,148 @@ const Planet = ({ data, history }) => {
   );
 };
 
-// --- 5. 核心太阳 (更霸气) ---
+// --- 5. 核心太阳 (修复版：全息蓝调 + 缩小尺寸) ---
 const DataCoreSun = () => {
+  const groupRef = useRef();
+  const textRef = useRef();
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+
+    // 1. 呼吸缩放逻辑优化
+    // 基础大小设为 0.4 (缩小到原来的40%)，在此基础上波动
+    const baseScale = 0.4;
+    const breathe = Math.sin(t * 1.5) * 0.02; // 呼吸幅度
+    const currentScale = baseScale + breathe;
+
+    if (groupRef.current) {
+      // 外层线框旋转
+      groupRef.current.rotation.z = t * 0.05;
+      groupRef.current.rotation.x = Math.sin(t * 0.1) * 0.1;
+    }
+
+    if (textRef.current) {
+      // 应用缩放
+      textRef.current.style.transform = `scale(${currentScale})`;
+    }
+  });
+
   return (
     <group>
-      {/* 核心 */}
+      {/* 1. 3D 实体部分 */}
       <Sphere args={[7, 32, 32]}>
         <MeshDistortMaterial color="#ff6600" emissive="#ff2200" emissiveIntensity={2} speed={2} distort={0.2} />
       </Sphere>
-      {/* 外部线框壳 */}
-      <mesh scale={[1.2, 1.2, 1.2]}>
-        <icosahedronGeometry args={[7, 1]} />
-        <meshBasicMaterial color="#ffaa00" wireframe transparent opacity={0.2} />
-      </mesh>
-      {/* 能量环 */}
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[10, 10.5, 64]} />
-        <meshBasicMaterial color="#ffaa00" transparent opacity={0.4} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} />
-      </mesh>
+
+      <group ref={groupRef}>
+        <mesh scale={[1.2, 1.2, 1.2]}>
+          <icosahedronGeometry args={[7, 1]} />
+          <meshBasicMaterial color="#ffaa00" wireframe transparent opacity={0.15} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[10, 10.2, 64]} />
+          <meshBasicMaterial color="#ffaa00" transparent opacity={0.3} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} />
+        </mesh>
+      </group>
+
       <pointLight distance={200} intensity={4} color="#ffaa00" />
-      <Html position={[0, 0, 0]} center style={{ pointerEvents: 'none' }}>
-        <div style={{
-          color: '#fff', fontWeight: '900', fontSize: '28px',
-          textShadow: '0 0 40px #ff3300', textAlign: 'center', letterSpacing: '6px',
-          mixBlendMode: 'overlay'
-        }}>
-          HELLO<br/>ALGO
+
+      {/* 2. HTML 文字层 (修复版) */}
+      {/* distanceFactor={15} 让文字随距离产生透视大小变化，数值越大文字越小 */}
+      {/* transform 属性让 HTML 像 3D 物体一样参与遮挡关系 (可选，这里为了清晰度未开启，仅靠 scale 控制) */}
+      <Html position={[0, 0, 0]} center style={{ pointerEvents: 'none', width: '600px', height: '200px' }} zIndexRange={[100, 0]}>
+
+        <style>{`
+          @keyframes glitch-skew {
+            0% { transform: skew(0deg); }
+            20% { transform: skew(-2deg); }
+            40% { transform: skew(2deg); }
+            60% { transform: skew(-1deg); }
+            80% { transform: skew(1deg); }
+            100% { transform: skew(0deg); }
+          }
+          @keyframes scanline {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+          @keyframes text-flicker {
+            0% { opacity: 1; }
+            3% { opacity: 0.5; }
+            6% { opacity: 1; }
+            7% { opacity: 0.5; }
+            8% { opacity: 1; }
+            9% { opacity: 1; }
+            100% { opacity: 1; }
+          }
+          .holo-text { animation: text-flicker 4s infinite; }
+          .glitch-effect { animation: glitch-skew 3s infinite linear alternate-reverse; }
+        `}</style>
+
+        <div
+          ref={textRef}
+          style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            fontFamily: "'Courier New', Courier, monospace",
+            textTransform: 'uppercase',
+            userSelect: 'none',
+            whiteSpace: 'nowrap',
+            // 初始 transform，会被 useFrame 覆盖
+            transform: 'scale(0.4)',
+            transition: 'transform 0.1s linear', // 保证缩放平滑
+          }}
+        >
+
+          {/* 顶层: XU'S (改为青色) */}
+          <div className="holo-text" style={{
+            fontSize: '24px',
+            color: '#00f2ff', // 电光蓝
+            letterSpacing: '12px',
+            marginBottom: '10px',
+            textShadow: '0 0 10px rgba(0, 242, 255, 0.8)',
+            borderBottom: '2px solid rgba(0, 242, 255, 0.5)',
+            paddingBottom: '5px',
+            width: '100%',
+            textAlign: 'center'
+          }}>
+            XU'S
+          </div>
+
+          {/* 中间: ALGORITHM (改为 白->蓝 渐变，避免与绿色冲突) */}
+          <div className="glitch-effect" style={{
+            fontSize: '80px', // 字体本身设大，通过 scale 缩小，清晰度更高
+            fontWeight: '900',
+            letterSpacing: '8px',
+            lineHeight: '1',
+            // 冰蓝色渐变
+            background: 'linear-gradient(180deg, #ffffff 0%, #00c3ff 100%)',
+            backgroundSize: '200% auto',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            // 蓝色辉光，与橙色太阳形成互补色对比
+            filter: 'drop-shadow(0 0 15px rgba(0, 195, 255, 0.9))'
+          }}>
+            ALGORITHM
+          </div>
+
+          {/* 底部: PLANET (改为深青色) */}
+          <div style={{
+            fontSize: '20px',
+            color: 'rgba(166, 247, 255, 0.7)',
+            letterSpacing: '16px',
+            marginTop: '15px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            borderTop: '1px solid rgba(0, 242, 255, 0.3)',
+            paddingTop: '10px'
+          }}>
+            <span style={{opacity:0.5}}>&lt;&lt;</span>
+            <span style={{margin: '0 15px'}}>PLANET</span>
+            <span style={{opacity:0.5}}>&gt;&gt;</span>
+          </div>
+
         </div>
       </Html>
     </group>
