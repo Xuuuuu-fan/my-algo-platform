@@ -74,43 +74,38 @@ int treeDepth(BiTree T) {
 
 
 ### 5.层序遍历代码实现
-```c++
-// --run-- g++ $tmpFile.cpp -o $tmpFile.out && $tmpFile.out
-#include <stdio.h>
-#include <stdlib.h>
 
+import CppRunner from '@site/src/components/CppRunner';
+
+<CppRunner initialCode={`#include <stdio.h>
+#include <stdlib.h>
 /* ================= 二叉树结点 ================= */
 typedef struct BiTNode {
     char data;                  // 结点数据域
     struct BiTNode *lchild;     // 左孩子指针
     struct BiTNode *rchild;     // 右孩子指针
 } BiTNode, *BiTree;             // BiTNode 是结构体，BiTree 是结构体指针
-
 /* ================= 链式队列 ================= */
 // 队列的结点类型
 typedef struct LinkNode {
     BiTree data;                // 存放“二叉树结点指针”
     struct LinkNode *next;      // 单链表指针
 } LinkNode;
-
 // 队列的头尾指针封装
 typedef struct {
     LinkNode *front;   // 队头指针（带头结点）
     LinkNode *rear;    // 队尾指针
 } LinkQueue;
-
 /* ---------- 队列基本操作 ---------- */
 // 1. 初始化队列（创建头结点，front/rear 都指向它）
 void InitQueue(LinkQueue &Q) {          // C++ 引用，方便修改实参
     Q.front = Q.rear = (LinkNode *)malloc(sizeof(LinkNode));
     Q.front->next = NULL;               // 头结点 next 为空
 }
-
 // 2. 判空：队头 == 队尾 说明队列空
 bool IsEmpty(LinkQueue Q) {
     return Q.front == Q.rear;
 }
-
 // 3. 入队：在队尾插入一个新元素
 void EnQueue(LinkQueue &Q, BiTree e) {
     LinkNode *s = (LinkNode *)malloc(sizeof(LinkNode));
@@ -119,7 +114,6 @@ void EnQueue(LinkQueue &Q, BiTree e) {
     Q.rear->next = s;    // 原尾结点指向新结点
     Q.rear = s;          // 更新尾指针
 }
-
 // 4. 出队：把头结点后面的第一个真正结点删掉
 bool DeQueue(LinkQueue &Q, BiTree &e) { // 用 e 把值带出去
     if (IsEmpty(Q)) return false;       // 空队列无法出队
@@ -131,20 +125,17 @@ bool DeQueue(LinkQueue &Q, BiTree &e) { // 用 e 把值带出去
     free(p);                            // 释放被删结点
     return true;
 }
-
 /* ================= 层序遍历 ================= */
 // 访问函数：这里简单打印字符
 void visit(BiTree T) {
     printf("%c ", T->data);
 }
-
 // 核心：层序遍历（广度优先）
 void LevelOrder(BiTree T) {
     if (!T) return;         // 空树直接返回
     LinkQueue Q;
     InitQueue(Q);           // 1. 初始化辅助队列
     EnQueue(Q, T);          // 2. 根结点入队
-
     while (!IsEmpty(Q)) {   // 3. 队列不空就循环
         BiTree p;
         DeQueue(Q, p);      // 3.1 队头出队
@@ -155,7 +146,6 @@ void LevelOrder(BiTree T) {
             EnQueue(Q, p->rchild);
     }
 }
-
 /* ================= 测试：手动建一棵二叉树 ================= */
 // 快速创建一个结点
 BiTree CreateNode(char c) {
@@ -164,7 +154,6 @@ BiTree CreateNode(char c) {
     t->lchild = t->rchild = NULL;
     return t;
 }
-
 int main() {
     /* 构造下图这棵树
             A
@@ -179,18 +168,16 @@ int main() {
     BiTree D = CreateNode('D');
     BiTree E = CreateNode('E');
     BiTree F = CreateNode('F');
-
     A->lchild = B; A->rchild = C;
     B->lchild = D; B->rchild = E;
     C->lchild = F;
-
     printf("LevelOrder: ");
     LevelOrder(A);   // 预期输出：A B C D E F
-    printf("\n");
     return 0;
 }
+`} />
 
-```
+
 
 ### 6.由遍历序列构造二叉树
 ![Img](/assets/树/03.png)

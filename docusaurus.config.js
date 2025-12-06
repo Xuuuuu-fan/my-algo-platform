@@ -4,6 +4,9 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
+const math = require('remark-math');
+const katex = require('rehype-katex');
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Algo Learn',
@@ -42,6 +45,9 @@ const config = {
           // 这里的 id 决定了点击“开始学习”时默认跳到哪一篇
           // 建议保留，或者改成你第一篇文章的 id (如 'intro')
           // routeBasePath: '/', // 如果想把文档设为首页，取消注释这行
+          // 2. 在这里添加 remarkPlugins 和 rehypePlugins
+          remarkPlugins: [math],
+          rehypePlugins: [katex],
         },
         blog: false, // 关闭博客
         theme: {
@@ -50,7 +56,16 @@ const config = {
       }),
     ],
   ],
-
+  // 3. 添加 stylesheets 配置 (这是为了加载公式的样式，非常重要！)
+  stylesheets: [
+    {
+      href: 'https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css',
+      type: 'text/css',
+      integrity:
+        'sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM',
+      crossorigin: 'anonymous',
+    },
+  ],
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -76,7 +91,7 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'tree/intro', // 点击导航栏“开始学习”跳转到的文档ID
+            docId: 'intro', // 点击导航栏“开始学习”跳转到的文档ID
             position: 'left',
             label: '开始学习',
           },
@@ -93,7 +108,7 @@ const config = {
       // -------------------------------------------------------
       footer: {
         style: 'dark',
-        copyright: `Copyright © ${new Date().getFullYear()} Algo Learn. Built with Docusaurus.`,
+        copyright: `版权所有 © ${new Date().getFullYear()} Ｘ𝐮’𝕤 𝔸𝔩𝔤ø ℙ𝔩𝔞𝔱𝔣ø𝔯𝔪.`,
       },
 
       // -------------------------------------------------------

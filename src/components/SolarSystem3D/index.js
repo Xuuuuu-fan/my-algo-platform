@@ -489,7 +489,7 @@ const SolarSystem3D = () => {
            background: 'rgba(0,0,0,0.8)', padding: '12px 40px', borderRadius: '4px',
            border: '1px solid rgba(0, 242, 255, 0.3)', boxShadow: '0 0 20px rgba(0, 242, 255, 0.1)'
          }}>
-            SYSTEM ONLINE // INITIALIZING...
+            拖拽探索 · 点击进入
          </span>
       </div>
     </div>
