@@ -128,6 +128,36 @@ const sidebars = {
       ],
     },
 
+    // 9. 哈希表
+    {
+      type: 'category',
+      label: '哈希表',
+      className: 'sidebar-icon-hash',
+      link: { type: 'generated-index' },
+      collapsed: true,
+      items: ['hash/intro'], // 确保 docs/hash/intro.md 存在
+    },
+
+    // 10. 贪心算法
+    {
+      type: 'category',
+      label: '贪心算法',
+      className: 'sidebar-icon-greedy',
+      link: { type: 'generated-index' },
+      collapsed: true,
+      items: ['greedy/intro'], // 确保 docs/greedy/intro.md 存在
+    },
+
+    // 11. 回溯算法
+    {
+      type: 'category',
+      label: '回溯算法',
+      className: 'sidebar-icon-backtrack',
+      link: { type: 'generated-index' },
+      collapsed: true,
+      items: ['backtrack/intro'], // 确保 docs/backtrack/intro.md 存在
+    },
+
     // 9. 排序 (Sort)
     {
       type: 'category',

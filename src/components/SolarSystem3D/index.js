@@ -1,27 +1,30 @@
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Stars, Html, MeshDistortMaterial, Sphere, Icosahedron, Torus } from '@react-three/drei';
+import { OrbitControls, Stars, Html, MeshDistortMaterial, Sphere } from '@react-three/drei';
 import { useHistory } from '@docusaurus/router';
 import * as THREE from 'three';
 
-// --- 1. 数据配置：更紧凑、更大的星系 ---
+// --- 1. 数据配置：新增哈希、贪心、回溯 ---
 const PLANETS = [
-  // 基础 (内圈 - 岩石行星)
+  // 基础 (内圈)
   { id: 'array', title: '数组', path: '/docs/demo', type: 'rocky', color: '#00f2ff', radius: 14, speed: 0.6, size: 1.8 },
   { id: 'linkedlist', title: '链表', path: '/docs/list/intro', type: 'rocky', color: '#00c3ff', radius: 19, speed: 0.5, size: 2.0 },
 
-  // 核心 (中圈 - 气态/特殊行星)
+  // 核心数据结构 (中圈)
   { id: 'stack', title: '栈', path: '/docs/stack/intro', type: 'gas', color: '#ff0055', radius: 26, speed: 0.4, size: 2.8 },
   { id: 'queue', title: '队列', path: '/docs/queue/intro', type: 'gas', color: '#ff9900', radius: 34, speed: 0.35, size: 3.0 },
+  { id: 'hash', title: '哈希表', path: '/docs/hash/intro', type: 'gas', color: '#b000b5', radius: 42, speed: 0.3, size: 3.2 }, // 新增
 
-  // 进阶 (外圈 - 巨大行星/环状行星)
-  { id: 'tree', title: '树/二叉树', path: '/docs/tree/intro', type: 'earth', color: '#00ff66', radius: 44, speed: 0.25, size: 3.5 },
-  { id: 'graph', title: '图论', path: '/docs/graph/intro', type: 'gas', color: '#bd00ff', radius: 56, speed: 0.2, size: 4.0 },
+  // 复杂结构 (外圈)
+  { id: 'tree', title: '树/二叉树', path: '/docs/tree/intro', type: 'earth', color: '#00ff66', radius: 52, speed: 0.25, size: 3.5 },
+  { id: 'graph', title: '图论', path: '/docs/graph/intro', type: 'gas', color: '#bd00ff', radius: 64, speed: 0.2, size: 4.0 },
 
-  // 算法 (边缘 - 环状/神秘)
-  { id: 'search', title: '查找', path: '/docs/search/intro', type: 'ring', color: '#ffe600', radius: 70, speed: 0.15, size: 3.2 },
-  { id: 'sort', title: '排序', path: '/docs/sort/intro', type: 'gas', color: '#ff3366', radius: 85, speed: 0.12, size: 3.8 },
-  { id: 'string', title: '字符串', path: '/docs/string/intro', type: 'ring', color: '#ffffff', radius: 100, speed: 0.08, size: 3.5 },
+  // 核心算法 (边缘圈)
+  { id: 'search', title: '查找', path: '/docs/search/intro', type: 'ring', color: '#ffe600', radius: 78, speed: 0.15, size: 3.2 },
+  { id: 'sort', title: '排序', path: '/docs/sort/intro', type: 'gas', color: '#ff3366', radius: 90, speed: 0.12, size: 3.8 },
+  { id: 'greedy', title: '贪心', path: '/docs/greedy/intro', type: 'rocky', color: '#ffd700', radius: 102, speed: 0.1, size: 3.0 }, // 新增
+  { id: 'backtrack', title: '回溯', path: '/docs/backtrack/intro', type: 'ring', color: '#ff4d4d', radius: 115, speed: 0.08, size: 3.6 }, // 新增
+  { id: 'string', title: '字符串', path: '/docs/string/intro', type: 'ring', color: '#ffffff', radius: 130, speed: 0.06, size: 3.5 },
 ];
 
 // --- 2. 原生粒子爆炸 ---
@@ -68,91 +71,70 @@ const NativeExplosion = ({ color, onComplete }) => {
   );
 };
 
-// --- 3. [核心升级] 差异化行星外观 ---
+// --- 3. 行星外观组件 ---
+const RockyVisuals = ({ color, size }) => (
+  <group>
+    <mesh>
+      <icosahedronGeometry args={[size, 0]} />
+      <meshStandardMaterial color={color} roughness={0.7} metalness={0.2} flatShading={true} />
+    </mesh>
+    <mesh scale={[1.05, 1.05, 1.05]}>
+      <icosahedronGeometry args={[size, 0]} />
+      <meshBasicMaterial color={color} wireframe transparent opacity={0.3} />
+    </mesh>
+  </group>
+);
 
-// 3.1 岩石行星 (Rocky): 棱角分明，低多边形风格
-const RockyVisuals = ({ color, size }) => {
-  return (
-    <group>
-      {/* 核心实体: 使用 Icosahedron detail=0 制造棱角 */}
-      <mesh>
-        <icosahedronGeometry args={[size, 0]} />
-        <meshStandardMaterial color={color} roughness={0.7} metalness={0.2} flatShading={true} />
-      </mesh>
-      {/* 线框覆盖，增强科技感 */}
-      <mesh scale={[1.05, 1.05, 1.05]}>
-        <icosahedronGeometry args={[size, 0]} />
-        <meshBasicMaterial color={color} wireframe transparent opacity={0.3} />
-      </mesh>
-    </group>
-  );
-};
+const GasVisuals = ({ color, size }) => (
+  <group>
+    <mesh>
+      <sphereGeometry args={[size * 0.8, 32, 32]} />
+      <meshBasicMaterial color={color} />
+    </mesh>
+    <Sphere args={[size, 32, 32]}>
+      <MeshDistortMaterial
+        color={color} speed={2} distort={0.2} radius={1}
+        transparent opacity={0.6} roughness={0} metalness={0.5}
+      />
+    </Sphere>
+    <mesh scale={[1.4, 1.4, 1.4]}>
+      <sphereGeometry args={[size, 32, 32]} />
+      <meshBasicMaterial color={color} transparent opacity={0.1} side={THREE.BackSide} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </mesh>
+  </group>
+);
 
-// 3.2 气态行星 (Gas): 光滑，多层大气，朦胧感
-const GasVisuals = ({ color, size }) => {
-  return (
-    <group>
-      {/* 内部核心 */}
-      <mesh>
-        <sphereGeometry args={[size * 0.8, 32, 32]} />
-        <meshBasicMaterial color={color} />
-      </mesh>
-      {/* 流动大气层 (DistortMaterial) */}
-      <Sphere args={[size, 32, 32]}>
-        <MeshDistortMaterial
-          color={color} speed={2} distort={0.2} radius={1}
-          transparent opacity={0.6} roughness={0} metalness={0.5}
-        />
-      </Sphere>
-      {/* 外部光晕 */}
-      <mesh scale={[1.4, 1.4, 1.4]}>
-        <sphereGeometry args={[size, 32, 32]} />
-        <meshBasicMaterial color={color} transparent opacity={0.1} side={THREE.BackSide} blending={THREE.AdditiveBlending} depthWrite={false} />
-      </mesh>
-    </group>
-  );
-};
+const RingVisuals = ({ color, size }) => (
+  <group>
+    <mesh>
+      <sphereGeometry args={[size, 32, 32]} />
+      <meshStandardMaterial color={color} roughness={0.5} />
+    </mesh>
+    <mesh rotation={[Math.PI / 2.5, 0, 0]}>
+      <ringGeometry args={[size * 1.4, size * 2.0, 64]} />
+      <meshBasicMaterial color={color} transparent opacity={0.6} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} />
+    </mesh>
+    <mesh rotation={[Math.PI / 2.5, 0, 0]}>
+      <ringGeometry args={[size * 2.1, size * 2.15, 64]} />
+      <meshBasicMaterial color={color} transparent opacity={0.3} side={THREE.DoubleSide} />
+    </mesh>
+  </group>
+);
 
-// 3.3 环状行星 (Ring/Saturn): 带有明显光环
-const RingVisuals = ({ color, size }) => {
-  return (
-    <group>
-      {/* 星球本体 */}
-      <mesh>
-        <sphereGeometry args={[size, 32, 32]} />
-        <meshStandardMaterial color={color} roughness={0.5} />
-      </mesh>
-      {/* 内环 */}
-      <mesh rotation={[Math.PI / 2.5, 0, 0]}>
-        <ringGeometry args={[size * 1.4, size * 2.0, 64]} />
-        <meshBasicMaterial color={color} transparent opacity={0.6} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} />
-      </mesh>
-      {/* 外环线 */}
-      <mesh rotation={[Math.PI / 2.5, 0, 0]}>
-        <ringGeometry args={[size * 2.1, size * 2.15, 64]} />
-        <meshBasicMaterial color={color} transparent opacity={0.3} side={THREE.DoubleSide} />
-      </mesh>
-    </group>
-  );
-};
+const EarthVisuals = ({ color, size }) => (
+  <group>
+    <mesh>
+      <icosahedronGeometry args={[size, 4]} />
+      <meshStandardMaterial color={color} roughness={0.5} metalness={0.8} />
+    </mesh>
+    <mesh scale={[1.2, 1.2, 1.2]}>
+      <sphereGeometry args={[size, 16, 16]} />
+      <meshBasicMaterial color={color} wireframe transparent opacity={0.15} />
+    </mesh>
+  </group>
+);
 
-// 3.4 地球型 (Earth): 类似岩石但更圆润，有发光
-const EarthVisuals = ({ color, size }) => {
-  return (
-    <group>
-      <mesh>
-        <icosahedronGeometry args={[size, 4]} />
-        <meshStandardMaterial color={color} roughness={0.5} metalness={0.8} />
-      </mesh>
-      <mesh scale={[1.2, 1.2, 1.2]}>
-        <sphereGeometry args={[size, 16, 16]} />
-        <meshBasicMaterial color={color} wireframe transparent opacity={0.15} />
-      </mesh>
-    </group>
-  );
-};
-
-// --- 4. 统一的行星逻辑 ---
+// --- 4. 行星逻辑 ---
 const Planet = ({ data, history }) => {
   const groupRef = useRef();
   const angleRef = useRef(Math.random() * Math.PI * 2);
@@ -161,18 +143,13 @@ const Planet = ({ data, history }) => {
 
   useFrame((state, delta) => {
     if (isExploding || !groupRef.current) return;
-
-    // 公转 (悬停时减速)
     if (!hovered) angleRef.current += delta * data.speed * 0.2;
     const x = Math.cos(angleRef.current) * data.radius;
     const z = Math.sin(angleRef.current) * data.radius;
     groupRef.current.position.set(x, 0, z);
-
-    // 自转
     groupRef.current.rotation.y += 0.01;
-    groupRef.current.rotation.z = 0.2; // 稍微倾斜
+    groupRef.current.rotation.z = 0.2;
 
-    // 悬停缩放动画
     const targetScale = hovered ? 1.3 : 1.0;
     const cur = groupRef.current.scale.x;
     const next = THREE.MathUtils.lerp(cur, targetScale, 0.1);
@@ -185,7 +162,6 @@ const Planet = ({ data, history }) => {
     document.body.style.cursor = 'auto';
   };
 
-  // 根据类型选择外观组件
   const renderVisuals = () => {
     switch(data.type) {
       case 'rocky': return <RockyVisuals color={data.color} size={data.size} />;
@@ -206,8 +182,6 @@ const Planet = ({ data, history }) => {
             onPointerOut={() => { document.body.style.cursor = 'auto'; setHover(false); }}
           >
             {renderVisuals()}
-
-            {/* 标签 */}
             <Html distanceFactor={80} position={[0, data.size + 2, 0]} center style={{ pointerEvents: 'none' }}>
               <div style={{
                 color: hovered ? '#fff' : 'rgba(255,255,255,0.8)',
@@ -228,57 +202,54 @@ const Planet = ({ data, history }) => {
           <NativeExplosion color={data.color} onComplete={() => history.push(data.path)} />
         </group>
       )}
-
-      {/* 轨道线 (更亮更明显) */}
       {!isExploding && (
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[data.radius - 0.1, data.radius + 0.1, 128]} />
-          <meshBasicMaterial
-            color={data.color}
-            transparent
-            opacity={0.15} // 提高不透明度
-            side={THREE.DoubleSide}
-            blending={THREE.AdditiveBlending}
-          />
+          <meshBasicMaterial color={data.color} transparent opacity={0.15} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} />
         </mesh>
       )}
     </group>
   );
 };
 
-// --- 5. 核心太阳 (修复版：全息蓝调 + 缩小尺寸) ---
+// --- 5. 核心太阳 (打字机效果) ---
 const DataCoreSun = () => {
   const groupRef = useRef();
   const textRef = useRef();
+  const [displayText, setDisplayText] = useState('');
+  const fullText = "ALGORITHM";
+
+  // 打字机效果
+  useEffect(() => {
+    let i = 0;
+    const timer = setInterval(() => {
+      setDisplayText(fullText.substring(0, i + 1));
+      i++;
+      if (i === fullText.length) clearInterval(timer);
+    }, 200); // 200ms 打一个字
+    return () => clearInterval(timer);
+  }, []);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
-
-    // 1. 呼吸缩放逻辑优化
-    // 基础大小设为 0.4 (缩小到原来的40%)，在此基础上波动
     const baseScale = 0.4;
-    const breathe = Math.sin(t * 1.5) * 0.02; // 呼吸幅度
+    const breathe = Math.sin(t * 1.5) * 0.02;
     const currentScale = baseScale + breathe;
 
     if (groupRef.current) {
-      // 外层线框旋转
       groupRef.current.rotation.z = t * 0.05;
       groupRef.current.rotation.x = Math.sin(t * 0.1) * 0.1;
     }
-
     if (textRef.current) {
-      // 应用缩放
       textRef.current.style.transform = `scale(${currentScale})`;
     }
   });
 
   return (
     <group>
-      {/* 1. 3D 实体部分 */}
       <Sphere args={[7, 32, 32]}>
         <MeshDistortMaterial color="#ff6600" emissive="#ff2200" emissiveIntensity={2} speed={2} distort={0.2} />
       </Sphere>
-
       <group ref={groupRef}>
         <mesh scale={[1.2, 1.2, 1.2]}>
           <icosahedronGeometry args={[7, 1]} />
@@ -289,124 +260,65 @@ const DataCoreSun = () => {
           <meshBasicMaterial color="#ffaa00" transparent opacity={0.3} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} />
         </mesh>
       </group>
-
       <pointLight distance={200} intensity={4} color="#ffaa00" />
 
-      {/* 2. HTML 文字层 (修复版) */}
-      {/* distanceFactor={15} 让文字随距离产生透视大小变化，数值越大文字越小 */}
-      {/* transform 属性让 HTML 像 3D 物体一样参与遮挡关系 (可选，这里为了清晰度未开启，仅靠 scale 控制) */}
       <Html position={[0, 0, 0]} center style={{ pointerEvents: 'none', width: '600px', height: '200px' }} zIndexRange={[100, 0]}>
-
         <style>{`
-          @keyframes glitch-skew {
-            0% { transform: skew(0deg); }
-            20% { transform: skew(-2deg); }
-            40% { transform: skew(2deg); }
-            60% { transform: skew(-1deg); }
-            80% { transform: skew(1deg); }
-            100% { transform: skew(0deg); }
-          }
-          @keyframes scanline {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-          }
           @keyframes text-flicker {
-            0% { opacity: 1; }
-            3% { opacity: 0.5; }
-            6% { opacity: 1; }
-            7% { opacity: 0.5; }
-            8% { opacity: 1; }
-            9% { opacity: 1; }
-            100% { opacity: 1; }
+            0% { opacity: 1; } 3% { opacity: 0.5; } 6% { opacity: 1; } 7% { opacity: 0.5; } 8% { opacity: 1; } 9% { opacity: 1; } 100% { opacity: 1; }
           }
+          @keyframes blink { 50% { opacity: 0; } }
           .holo-text { animation: text-flicker 4s infinite; }
-          .glitch-effect { animation: glitch-skew 3s infinite linear alternate-reverse; }
+          .cursor { display: inline-block; width: 10px; background: #00c3ff; animation: blink 1s step-end infinite; }
         `}</style>
 
-        <div
-          ref={textRef}
-          style={{
+        <div ref={textRef} style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            fontFamily: "'Courier New', Courier, monospace",
-            textTransform: 'uppercase',
-            userSelect: 'none',
-            whiteSpace: 'nowrap',
-            // 初始 transform，会被 useFrame 覆盖
-            transform: 'scale(0.4)',
-            transition: 'transform 0.1s linear', // 保证缩放平滑
+            fontFamily: "'Courier New', Courier, monospace", textTransform: 'uppercase', userSelect: 'none', whiteSpace: 'nowrap',
+            transform: 'scale(0.4)', transition: 'transform 0.1s linear',
           }}
         >
-
-          {/* 顶层: XU'S (改为青色) */}
           <div className="holo-text" style={{
-            fontSize: '24px',
-            color: '#00f2ff', // 电光蓝
-            letterSpacing: '12px',
-            marginBottom: '10px',
-            textShadow: '0 0 10px rgba(0, 242, 255, 0.8)',
-            borderBottom: '2px solid rgba(0, 242, 255, 0.5)',
-            paddingBottom: '5px',
-            width: '100%',
-            textAlign: 'center'
+            fontSize: '24px', color: '#00f2ff', letterSpacing: '12px', marginBottom: '10px',
+            textShadow: '0 0 10px rgba(0, 242, 255, 0.8)', borderBottom: '2px solid rgba(0, 242, 255, 0.5)',
+            paddingBottom: '5px', width: '100%', textAlign: 'center'
           }}>
             XU'S
           </div>
 
-          {/* 中间: ALGORITHM (改为 白->蓝 渐变，避免与绿色冲突) */}
-          <div className="glitch-effect" style={{
-            fontSize: '80px', // 字体本身设大，通过 scale 缩小，清晰度更高
-            fontWeight: '900',
-            letterSpacing: '8px',
-            lineHeight: '1',
-            // 冰蓝色渐变
-            background: 'linear-gradient(180deg, #ffffff 0%, #00c3ff 100%)',
-            backgroundSize: '200% auto',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            // 蓝色辉光，与橙色太阳形成互补色对比
-            filter: 'drop-shadow(0 0 15px rgba(0, 195, 255, 0.9))'
+          <div style={{
+            fontSize: '80px', fontWeight: '900', letterSpacing: '8px', lineHeight: '1',
+            background: 'linear-gradient(180deg, #ffffff 0%, #00c3ff 100%)', backgroundSize: '200% auto',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            filter: 'drop-shadow(0 0 15px rgba(0, 195, 255, 0.9))',
+            display: 'flex', alignItems: 'baseline'
           }}>
-            ALGORITHM
+            {displayText}
+            <span className="cursor">_</span>
           </div>
 
-          {/* 底部: PLANET (改为深青色) */}
           <div style={{
-            fontSize: '20px',
-            color: 'rgba(166, 247, 255, 0.7)',
-            letterSpacing: '16px',
-            marginTop: '15px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            borderTop: '1px solid rgba(0, 242, 255, 0.3)',
-            paddingTop: '10px'
+            fontSize: '20px', color: 'rgba(166, 247, 255, 0.7)', letterSpacing: '16px', marginTop: '15px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%',
+            borderTop: '1px solid rgba(0, 242, 255, 0.3)', paddingTop: '10px'
           }}>
             <span style={{opacity:0.5}}>&lt;&lt;</span>
             <span style={{margin: '0 15px'}}>PLANET</span>
             <span style={{opacity:0.5}}>&gt;&gt;</span>
           </div>
-
         </div>
       </Html>
     </group>
   );
 };
 
-// --- 6. 背景装饰 (Nebula Cloud 增加充实感) ---
+// --- 6. 背景装饰 ---
 const Nebula = () => {
   const count = 5;
-  const data = useMemo(() => {
-    return new Array(count).fill(0).map(() => ({
-      x: (Math.random() - 0.5) * 200,
-      y: (Math.random() - 0.5) * 50,
-      z: (Math.random() - 0.5) * 200,
-      scale: 20 + Math.random() * 20,
-      color: Math.random() > 0.5 ? '#2f54eb' : '#bd00ff'
-    }));
-  }, []);
-
+  const data = useMemo(() => new Array(count).fill(0).map(() => ({
+      x: (Math.random() - 0.5) * 200, y: (Math.random() - 0.5) * 50, z: (Math.random() - 0.5) * 200,
+      scale: 20 + Math.random() * 20, color: Math.random() > 0.5 ? '#2f54eb' : '#bd00ff'
+    })), []);
   return (
     <group>
       {data.map((d, i) => (
@@ -419,9 +331,8 @@ const Nebula = () => {
   );
 };
 
-// --- 7. 原生粒子星空 ---
 const NativeStarField = () => {
-  const count = 1500; // 增加星星数量
+  const count = 1500;
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
     for(let i=0; i<count; i++) {
@@ -434,7 +345,6 @@ const NativeStarField = () => {
     }
     return pos;
   }, []);
-
   return (
     <points>
       <bufferGeometry><bufferAttribute attachObject={['attributes', 'position']} count={count} array={positions} itemSize={3} /></bufferGeometry>
@@ -443,54 +353,36 @@ const NativeStarField = () => {
   );
 };
 
-// --- 8. 主场景 ---
+// --- 7. 主场景 ---
 const SolarSystem3D = () => {
   const history = useHistory();
-
   return (
     <div style={{ width: '100%', height: '100vh', background: '#020204' }}>
-      <Canvas
-        // 调整相机：视角更低，更广 (FOV 45 -> 55)，距离拉近 (Z 70 -> 60)
-        camera={{ position: [0, 40, 60], fov: 55 }}
-      >
+      <Canvas camera={{ position: [0, 60, 90], fov: 55 }}>
         <ambientLight intensity={0.2} />
-
-        {/* 环境层 */}
         <NativeStarField />
-        <Nebula /> {/* 新增星云 */}
-
-        {/* 底部全息网格 */}
+        <Nebula />
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -15, 0]}>
           <planeGeometry args={[600, 600, 60, 60]} />
           <meshBasicMaterial color="#1a2b3c" wireframe transparent opacity={0.06} />
         </mesh>
-
         <DataCoreSun />
-
         {PLANETS.map((planet) => (
           <Planet key={planet.id} data={planet} history={history} />
         ))}
-
-        <OrbitControls
-          enablePan={false} enableZoom={true}
-          maxDistance={200} minDistance={30}
-          autoRotate={true} autoRotateSpeed={0.15}
-          maxPolarAngle={Math.PI / 2} // 禁止钻地
-        />
+        <OrbitControls enablePan={false} enableZoom={true} maxDistance={250} minDistance={30} autoRotate={true} autoRotateSpeed={0.15} maxPolarAngle={Math.PI / 2} />
       </Canvas>
-
-      {/* 底部提示 */}
       <div style={{
-        position: 'absolute', bottom: '40px', width: '100%', textAlign: 'center', pointerEvents: 'none', zIndex: 10
+        position: 'absolute', bottom: '50px', width: '100%', textAlign: 'center', pointerEvents: 'none', zIndex: 10
       }}>
-         <span style={{
-           color: '#00f2ff', fontSize: '14px', letterSpacing: '3px', fontWeight: 'bold',
-           textShadow: '0 0 10px rgba(0, 242, 255, 0.8)',
-           background: 'rgba(0,0,0,0.8)', padding: '12px 40px', borderRadius: '4px',
-           border: '1px solid rgba(0, 242, 255, 0.3)', boxShadow: '0 0 20px rgba(0, 242, 255, 0.1)'
+         <div style={{
+           display: 'inline-block', color: '#00f3ff', fontFamily: '"Courier New", Courier, monospace',
+           fontSize: '14px', fontWeight: 'bold', letterSpacing: '2px', border: '1px solid #00f3ff',
+           padding: '12px 30px', borderRadius: '4px', background: 'rgba(0, 0, 0, 0.7)',
+           boxShadow: '0 0 15px rgba(0, 243, 255, 0.4), inset 0 0 10px rgba(0, 243, 255, 0.2)', textTransform: 'uppercase'
          }}>
-            拖拽探索 · 点击进入
-         </span>
+            拖拽探索.点击进入
+         </div>
       </div>
     </div>
   );

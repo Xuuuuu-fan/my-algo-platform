@@ -61,10 +61,12 @@
 .menu__list-item[class*="sidebar-icon-"] .menu__link::before {
   content: '';
   display: inline-block;
-  width: 20px;     /* 图标宽度 */
-  height: 20px;    /* 图标高度 */
+  width: 20px;
+  height: 20px;
   margin-right: 10px;
-  background-color: var(--ifm-color-primary); /* 使用你的主题色(青色) */
+
+  /* 【修改点 1】默认颜色改为灰色，与未选中文字一致 */
+  background-color: #94a3b8;
 
   /* 核心：使用 mask 遮罩 */
   -webkit-mask-repeat: no-repeat;
@@ -74,10 +76,17 @@
   -webkit-mask-size: contain;
   mask-size: contain;
 
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-/* 鼠标悬停时，图标变亮白，增加交互感 */
+/* 【修改点 2】新增：当菜单被选中(Active)时，图标变回青色 */
+.menu__list-item--active[class*="sidebar-icon-"] .menu__link::before,
+.menu__list-item a[class*="sidebar-icon-"].menu__link--active::before {
+  background-color: var(--ifm-color-primary);
+  box-shadow: 0 0 8px var(--ifm-color-primary); /* 增加一点微光 */
+}
+
+/* 鼠标悬停时，图标变亮白 (保持原样或微调) */
 .menu__list-item a[class*="sidebar-icon-"]:hover::before,
 .menu__list-item[class*="sidebar-icon-"] .menu__link:hover::before {
   background-color: #fff;
@@ -159,4 +168,22 @@
 /* 视觉隐喻：字符序列 */
 .sidebar-icon-string .menu__link::before {
   -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M4 7V4h16v3"></path><path d="M9 20h6"></path><path d="M12 4v16"></path></svg>');
+}
+
+/* 8. 哈希表 (Hash) -> 井号/网格 */
+/* 视觉隐喻：键值对映射结构 */
+.sidebar-icon-hash .menu__link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>');
+}
+
+/* 9. 贪心算法 (Greedy) -> 钻石/宝石 */
+/* 视觉隐喻：每一步都选择当前价值最高的 */
+.sidebar-icon-greedy .menu__link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M6 3h12l4 9-10 10-10-10 4-9z"></path></svg>');
+}
+
+/* 10. 回溯算法 (Backtrack) -> 回撤箭头 */
+/* 视觉隐喻：走不通就退回上一步 */
+.sidebar-icon-backtrack .menu__link::before {
+  -webkit-mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg>');
 }
