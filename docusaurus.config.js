@@ -100,6 +100,11 @@ const config = {
             label: 'GitHub',
             position: 'right',
           },
+          {
+            to: '/wall',  // 对应 src/pages/wall.js
+            label: '留言墙',
+            position: 'left',
+          },
         ],
       },
 
