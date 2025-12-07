@@ -15,7 +15,7 @@ const config = {
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/xiangsu.png',
 
   // 国际化设置
   i18n: {
@@ -28,8 +28,23 @@ const config = {
   // -------------------------------------------------------
 
   // 1. 启用 Mermaid 画图主题
-  themes: ['@docusaurus/theme-mermaid'],
+  themes: [
+    '@docusaurus/theme-mermaid',
 
+    [
+      require.resolve("@easyops-cn/docusaurus-search-local"),
+      /** @type {import("@easyops-cn/docusaurus-search-local").PluginOptions} */
+      ({
+        hashed: true,
+        language: ["en", "zh"],
+        indexDocs: true,
+        indexBlog: false,
+        // 千万不要加 explicitSearchResultPath: true
+      }),
+    ],
+  ],
+
+  plugins: [],
   // 2. 开启 Markdown 对 Mermaid 的支持
   markdown: {
     mermaid: true,
@@ -96,7 +111,7 @@ const config = {
             label: '开始学习',
           },
           {
-            href: 'https://github.com/facebook/docusaurus', // 替换你的 GitHub
+            href: 'https://github.com/Xuuuuu-fan/my-algo-platform', // 替换你的 GitHub
             label: 'GitHub',
             position: 'right',
           },
