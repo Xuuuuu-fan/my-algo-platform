@@ -155,3 +155,23 @@ import KruskalVisualizer from '@site/src/components/AlgoScenes/KruskalVisualizer
 import BFSShortestPath from '@site/src/components/AlgoScenes/BFSShortestPath';
 
 <BFSShortestPath />
+
+## 12.最短路径.dijkstra
+import DijkstraVisualizer from '@site/src/components/AlgoScenes/DijkstraVisualizer';
+
+<DijkstraVisualizer />
+
+## 13.最短路径.floyd
+import FloydVisualizer from '@site/src/components/AlgoScenes/FloydVisualizer';
+
+<FloydVisualizer />
+
+## 14.拓扑排序
+import TopologicalSortVisualizer from '@site/src/components/AlgoScenes/TopologicalSortVisualizer';
+
+<TopologicalSortVisualizer />
+
+## 15.关键路径
+import CPMVisualizer from '@site/src/components/AlgoScenes/CPMVisualizer';
+
+<CPMVisualizer />
