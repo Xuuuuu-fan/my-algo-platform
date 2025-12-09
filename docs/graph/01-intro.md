@@ -1,177 +1,126 @@
 ---
 id: intro
-title: 1. 树的定义与术语
+title: 一.图的基本概念
 sidebar_position: 1
 ---
 
-待续
 
-import GraphOperationsGallery from '@site/src/components/AlgoScenes/GraphOperationsGallery';
+### 1、图的定义
 
-## 1.图的基本操作动态演示
+- 图 G 由顶点集 V 和边集 E 组成，记作：
+  
+  G = (V, E)
+  
+  - |V|：顶点个数，称为图的阶
+  - |E|：边的条数
 
-图的操作效率很大程度上取决于存储结构。
-下方对比了**邻接矩阵**和**邻接表**在"添加边"和"删除顶点"时的不同表现。
+> ⚠️ 注意：  
+- 线性表可以为空，树可以为空，但 图不可以为空图，即 V 必须是非空集合
 
-:::tip 考研重点
-*   **邻接矩阵**：删点极慢 O(|V|²)，因为要搬移大量数组元素。加边极快 O(1)。
-*   **邻接表**：删点较慢 O(|E|)，因为要遍历所有边表找入边。加边极快 O(1) (头插法)。
-:::
+---
 
-<GraphOperationsGallery />
+### 2、图的分类
 
-import GraphStorageGallery from '@site/src/components/AlgoScenes/GraphStorageGallery';
+1. 无向图 vs 有向图
 
-[//]: # (## 2.图的存储结构演示)
+| 类型 | 边的表示 | 特点描述 |  |
+| -- | -- | -- | -- |
+| 无向图 | (v, w) | 边无方向，(v, w) = (w, v) |  |
+| 有向图 | <v, w> | 边有方向，<v, w> ≠ <w, v>，v 为弧尾，w 为弧头 |  |
 
-[//]: # ()
-[//]: # (图的存储方法多种多样，除了基础的矩阵和邻接表，还有专门解决特定问题的**十字链表**和**邻接多重表**。)
+---
 
-[//]: # ()
-[//]: # (:::tip 难点解析)
+### 3、简单图与多重图
 
-[//]: # (*   **十字链表**：用于**有向图**。它像一个矩阵，但每个“格子”是一个链表节点。绿线代表出度（Tail），橙线代表入度（Head）。容易求顶点的出度和入度。)
+| 类型 | 定义说明 |  |
+| -- | -- | -- |
+| 简单图 | 无重复边，无边连接到自身 |  |
+| 多重图 | 允许两个顶点间有多条边，允许自环 |  |
 
-[//]: # (*   **邻接多重表**：用于**无向图**。解决了邻接表中“一条边存两遍”的冗余，且删除边时不需要遍历两个链表。)
+> 数据结构课程中仅讨论简单图
 
-[//]: # (:::)
+---
 
-[//]: # ()
-[//]: # (<GraphStorageGallery />)
+### 4、顶点的度
 
+无向图：
+- 度 TD(v)：与顶点 v 相连的边的数量
+- 所有顶点度之和：
+  
+ ![Img](/assets/图/01.png)
 
-[//]: # (// import CustomGraphBuilder from '@site/src/components/AlgoScenes/CustomGraphBuilder';)
+有向图：
+- 入度 ID(v)：指向顶点 v 的边的数量
+- 出度 OD(v)：从顶点 v 出发的边的数量
+- 总度：
+  
+  TD(v) = ID(v) + OD(v)
+  
+- 所有顶点入度之和 = 出度之和 = |E|
 
-[//]: # (## 🚀 实验室：自定义有向图与十字链表)
+---
 
-[//]: # ()
-[//]: # (你可以自由创建节点和连线，算法会实时为你构建十字链表。)
+### 5、路径相关概念
 
-[//]: # ()
-[//]: # (<CustomGraphBuilder />)
+- 路径：顶点序列，相邻顶点之间有边
+- 简单路径：路径中顶点不重复
+- 简单回路：起点和终点相同，其余顶点不重复
+- 点到点距离：从 u 到 v 的最短路径长度（若无路径，距离为 ∞）
 
-[//]: # ()
-[//]: # (**使用说明：**)
+---
 
-[//]: # (1. 点击 **添加顶点** 增加节点（支持拖拽移动）。)
+### 6、连通性
 
-[//]: # (2. 在下拉框选择起点和终点，点击 **添加/删除连线**。)
+无向图：
+- 连通图：任意两个顶点之间都有路径
+- 非连通图：存在不连通的顶点
+- 连通分量：极大连通子图
 
-[//]: # (3. 观察右侧生成的十字链表：)
+有向图：
+- 强连通图：任意两个顶点 u 和 v 之间都有双向路径
+- 强连通分量：极大强连通子图
+ ![Img](/assets/图/03.png)
+---
 
-[//]: # (   - 绿色线连接同一行的节点（从 V0 出发的边）。)
+### 7、子图与生成图
 
-[//]: # (   - 橙色线连接同一列的节点（指向 V1 的边）。)
+- 子图：G' = (V', E')，其中 V' ⊆ V，E' ⊆ E
+- 生成子图：V' = V，E' ⊆ E
+- 生成树：连通图的极小连通子图，包含所有顶点，边数为 n-1
+- 生成森林：非连通图中各连通分量的生成树集合
+ ![Img](/assets/图/02.png)
+---
 
-[//]: # (- ---)
+### 8、带权图（网）
 
-[//]: # (id: storage)
+- 边的权：边所附带的数值（如距离、费用等）
+- 带权图/网：边带权值的图
+- 带权路径长度：路径上所有边的权值之和
 
-[//]: # (title: 图的存储结构)
+---
 
-[//]: # (---)
-
-[//]: # (import OrthogonalListVisualizer from '@site/src/components/AlgoScenes/OrthogonalListVisualizer';)
-
-[//]: # ()
-[//]: # (# 图的存储结构)
-
-[//]: # ()
-[//]: # (## 4. 十字链表 &#40;Orthogonal List&#41;)
-
-[//]: # ()
-[//]: # (十字链表是有向图的另一种链式存储结构。可以看作是**邻接表**和**逆邻接表**的结合。)
-
-[//]: # ()
-[//]: # (### 核心特性)
-
-[//]: # (- **顶点结点**：包含数据域 `data`，入边链头 `firstIn`，出边链头 `firstOut`。)
-
-[//]: # (- **弧结点**：包含尾域 `tailVex` &#40;起点&#41;，头域 `headVex` &#40;终点&#41;，链头链域 `hLink` &#40;指向下一条同入度的边&#41;，链尾链域 `tLink` &#40;指向下一条同出度的边&#41;。)
-
-[//]: # ()
-[//]: # (### 交互演示)
-
-[//]: # (下方左侧是逻辑图，右侧是十字链表在内存中的形态。)
-
-[//]: # (- **添加/删除连线**，观察右侧 **橙色&#40;tLink&#41;** 和 **绿色&#40;hLink&#41;** 线条的变化。)
-
-[//]: # (- **橙色实线**：表示 `tLink`，连接所有**起点相同**的边（相当于邻接表）。)
-
-[//]: # (- **绿色虚线**：表示 `hLink`，连接所有**终点相同**的边（相当于逆邻接表）。)
-
-[//]: # ()
-[//]: # (<OrthogonalListVisualizer />)
-## 2.十字链表
-import OrthogonalListDemo from '@site/src/components/AlgoScenes/OrthogonalListDemo';
-
-<OrthogonalListDemo />
-
-
-## 3.邻接多重表
-import AdjacencyMultilistDemo from '@site/src/components/AlgoScenes/AdjacencyMultilistDemo';
-
-<AdjacencyMultilistDemo />
-
-## 4.邻接矩阵法
-可切换有向图/无向图
-
-import AdjacencyMatrixDemo from '@site/src/components/AlgoScenes/AdjacencyMatrixDemo';
-
-<AdjacencyMatrixDemo />
-
-## 5.邻接表法
-import AdjacencyListDemo from '@site/src/components/AlgoScenes/AdjacencyListDemo';
-
-<AdjacencyListDemo />
-
-## 6.深度遍历
-import DFSVisualizer from '@site/src/components/AlgoScenes/DFSVisualizer';
-
-<DFSVisualizer />
-
-
-## 7.广度遍历
-import BFSVisualizer from '@site/src/components/AlgoScenes/BFSVisualizer';
-
-<BFSVisualizer />
-
-## 8.广度/深度最小生成树
-import GraphTreeDemo from '@site/src/components/AlgoScenes/GraphTreeDemo';
-
-<GraphTreeDemo />
-
-## 9.prime
-import PrimVisualizer from '@site/src/components/AlgoScenes/PrimVisualizer';
-
-<PrimVisualizer />
-
-## 10.kruskal
-import KruskalVisualizer from '@site/src/components/AlgoScenes/KruskalVisualizer';
-
-<KruskalVisualizer />
-
-## 11.最短路径.bfs
-import BFSShortestPath from '@site/src/components/AlgoScenes/BFSShortestPath';
-
-<BFSShortestPath />
-
-## 12.最短路径.dijkstra
-import DijkstraVisualizer from '@site/src/components/AlgoScenes/DijkstraVisualizer';
-
-<DijkstraVisualizer />
-
-## 13.最短路径.floyd
-import FloydVisualizer from '@site/src/components/AlgoScenes/FloydVisualizer';
-
-<FloydVisualizer />
-
-## 14.拓扑排序
-import TopologicalSortVisualizer from '@site/src/components/AlgoScenes/TopologicalSortVisualizer';
-
-<TopologicalSortVisualizer />
-
-## 15.关键路径
-import CPMVisualizer from '@site/src/components/AlgoScenes/CPMVisualizer';
-
-<CPMVisualizer />
+### 9、特殊图形态
+| 类型 | 特点描述 |  |
+| -- | -- | -- |
+| 完全图 | 任意两个顶点之间都有边（无向）或双向弧（有向） |  |
+| 稠密图 | 边数较多，通常 |  |
+| 稀疏图 | 边数较少，通常 |  |
+| 树 | 无向连通图，无回路，边数为 n-1 |  |
+| 有向树 | 有向图中，一个顶点入度为 0，其余顶点入度为 1 |  |
+![Img](/assets/图/04.png)
+
+### 10、常见考点总结
+
+无向图：
+- 所有顶点度之和 = 2|E|
+- 连通图最少有 n-1 条边
+- 若 |E| > n-1，则图中必有回路
+- 非连通图最多有 C(n-1, 2) 条边
+- 完全图有 n(n-1)/2 条边
+
+有向图：
+- 所有顶点出度之和 = 入度之和 = |E|
+- 所有顶点度之和 = 2|E|
+- 强连通图最少有 n 条边（形成回路）
+- 完全图有 n(n-1) 条边
+ ![Img](/assets/图/05.png)
