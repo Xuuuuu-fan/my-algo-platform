@@ -1,3 +1,24 @@
+:root {
+  --ifm-color-primary: #719e8f;
+  --ifm-color-primary-dark: #668e80;
+  --ifm-color-primary-darker: #608679;
+  --ifm-color-primary-darkest: #4f6f64;
+  --ifm-color-primary-light: #7caea0;
+  --ifm-color-primary-lighter: #82b6a8;
+  --ifm-color-primary-lightest: #93c6b8;
+}
+
+/* 暗黑模式下的微调 */
+[data-theme='dark'] {
+  --ifm-color-primary: #7eb0a0;
+  --ifm-color-primary-dark: #719e8f;
+  --ifm-color-primary-darker: #668e80;
+  --ifm-color-primary-darkest: #4f6f64;
+  --ifm-color-primary-light: #8bc2b1;
+  --ifm-color-primary-lighter: #93c9b9;
+  --ifm-color-primary-lightest: #a8d6c9;
+}
+
 /* 引入字体 */
 
 /* 让导航栏半透明，与星空背景融合 */

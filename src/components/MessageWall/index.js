@@ -4,9 +4,9 @@ import styles from './styles.module.css';
 import AV from 'leancloud-storage';
 
 // ================= 配置区 =================
-const APP_ID = "C69cQ4v1eB5mO090Jd6QTcjR-gzGzoHsz";
-const APP_KEY = "2wtdJHN0TrF8DgK3d4cs9rpa";
-const SERVER_URL = "https://c69cq4v1.lc-cn-n1-shared.com";
+const APP_ID = "6XhmNIffmUgeQYvV41nEDN9v-MdYXbMMI";
+const APP_KEY = "OFwmlGnmNpzTmSFgqBqYDvgw";
+const SERVER_URL = "https://6xhmniff.api.lncldglobal.com";
 const ADMIN_SECRET = "xualgo";
 
 if (!AV.applicationId) {
